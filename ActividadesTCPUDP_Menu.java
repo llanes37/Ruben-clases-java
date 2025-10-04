@@ -9,21 +9,31 @@ import java.util.concurrent.*;
 
 /*
 ================================================================================
-   Actividades TCP/UDP — DAM M0490 (Traducción + Menú autoejecutable)
-   Autor: ChatGPT (preparado para las clases de Rubén)
+    Actividades TCP/UDP — DAM M0490 (Traducción + Menú autoejecutable)
+    Autor: ChatGPT (preparado para las clases de Rubén)
 
-   ▶ Cómo usar
-   1) Guarda este archivo como: ActividadesTCPUDP_Menu.java
-   2) Compila/Ejecuta en VS Code con "Run Java" o en terminal:
-        javac ActividadesTCPUDP_Menu.java && java ActividadesTCPUDP_Menu
-   3) Aparece un MENÚ. Elige el ejercicio que quieras ejecutar.
-   4) Los enunciados están traducidos y documentados con "Better Comments":
-      // ! Importante, // * Info, // ? Nota, // TODO: Retos extra
+    ▶ Cómo usar
+    1) Guarda este archivo como: ActividadesTCPUDP_Menu.java
+    2) Compila/Ejecuta en VS Code con "Run Java" o en terminal:
+          javac ActividadesTCPUDP_Menu.java && java ActividadesTCPUDP_Menu
+    3) Aparece un MENÚ. Elige el ejercicio que quieras ejecutar.
+    4) Los enunciados están traducidos y documentados con "Better Comments":
+        // Importante, // Info, // Nota, // TODO: Retos extra
 
-   💡 Objetivo pedagógico
-   - Tener un único .java con MENÚ + DEMOS locales (servidor/cliente en localhost).
-   - El alumno lee el enunciado (comentarios) y ejecuta cada práctica por separado.
-   - Al final de cada práctica hay "TODOs" (retos extra) para consolidar.
+    Objetivo pedagógico
+    - Tener un único .java con MENÚ + DEMOS locales (servidor/cliente en localhost).
+    - El alumno lee el enunciado (comentarios) y ejecuta cada práctica por separado.
+    - Al final de cada práctica hay "TODOs" (retos extra) para consolidar.
+
+    ¿Qué es un servidor UDP?
+    Un servidor UDP utiliza el protocolo de datagramas de usuario (UDP) para enviar y recibir datos. 
+    Es rápido y eficiente, pero no garantiza la entrega ni el orden de los paquetes.
+    Ideal para aplicaciones donde la velocidad es más importante que la fiabilidad.
+
+    ¿Qué es un servidor TCP?
+    Un servidor TCP utiliza el protocolo de control de transmisión (TCP) para establecer una conexión confiable.
+    Garantiza que los datos lleguen completos y en el orden correcto.
+    Es adecuado para aplicaciones donde la fiabilidad es crucial, como chats o transferencias de archivos.
 ================================================================================
 */
 
@@ -95,68 +105,85 @@ public class ActividadesTCPUDP_Menu {
         // Generador aleatorio para simular pérdidas de datagramas.
         Random rnd = new Random();
 
-        // Servidor UDP (puerto efímero: 0)
+        // Clase interna que representa el servidor UDP.
         class Server extends Thread {
-            volatile boolean running = true;
-            DatagramSocket ds;
-            int port = -1;
+            volatile boolean running = true; // Bandera para controlar el ciclo de ejecución del servidor.
+            DatagramSocket ds; // Socket UDP para recibir y enviar datagramas.
+            int port = -1; // Puerto en el que el servidor estará escuchando.
+
             public void run() {
-                try (DatagramSocket s = new DatagramSocket(0)) {
-					// Se crea socket en puerto efímero y se guarda para tests.
-                    ds = s;
-                    port = s.getLocalPort();
-                    byte[] buf = new byte[1024];
-                    while (running) {
-                        // Espera bloqueante por un datagrama.
-                        DatagramPacket p = new DatagramPacket(buf, buf.length);
-                        s.receive(p);
+                try (DatagramSocket s = new DatagramSocket(0)) { // Se crea un socket en un puerto efímero.
+                    ds = s; // Guardamos la referencia al socket para detenerlo más tarde.
+                    port = s.getLocalPort(); // Obtenemos el puerto asignado automáticamente.
+                    byte[] buf = new byte[1024]; // Buffer para recibir datos.
+
+                    while (running) { // Bucle principal del servidor.
+                        DatagramPacket p = new DatagramPacket(buf, buf.length); // Preparamos un paquete para recibir datos.
+                        s.receive(p); // Esperamos a recibir un datagrama (bloqueante).
+
                         // Simulación de pérdidas ~20%: simplemente no respondemos.
                         if (rnd.nextDouble() < 0.2) {
                             // * Se "pierde": no respondemos. Esto simula un entorno no confiable.
-                            continue;
+                            continue; // Saltamos al siguiente ciclo sin responder.
                         }
-                        // Procesamos el contenido: se espera un número en texto.
+
+                        // Procesamos el contenido: se espera un número en formato texto.
                         String text = new String(p.getData(), 0, p.getLength(), StandardCharsets.UTF_8).trim();
-                        int n = Integer.parseInt(text);
-                        int doubled = n * 2;
-                        // Enviamos la respuesta con el doble.
-                        byte[] out = ("" + doubled).getBytes(StandardCharsets.UTF_8);
-                        DatagramPacket r = new DatagramPacket(out, out.length, p.getAddress(), p.getPort());
-                        s.send(r);
+                        int n = Integer.parseInt(text); // Convertimos el texto recibido a un número entero.
+                        int doubled = n * 2; // Calculamos el doble del número recibido.
+
+                        // Enviamos la respuesta con el doble del número recibido.
+                        byte[] out = ("" + doubled).getBytes(StandardCharsets.UTF_8); // Convertimos el resultado a bytes.
+                        DatagramPacket r = new DatagramPacket(out, out.length, p.getAddress(), p.getPort()); // Preparamos el paquete de respuesta.
+                        s.send(r); // Enviamos el paquete al cliente.
                     }
                 } catch (IOException e) {
+                    // Capturamos cualquier excepción de E/S y mostramos un mensaje si el servidor estaba en ejecución.
                     if (running) System.out.println("Servidor UDP (E1) detenido: " + e.getMessage());
                 }
             }
-            void stopServer() { running = false; if (ds != null) ds.close(); }
+
+            // Método para detener el servidor de forma segura.
+            void stopServer() { 
+                running = false; // Cambiamos la bandera para salir del bucle.
+                if (ds != null) ds.close(); // Cerramos el socket si está abierto.
+            }
         }
 
+        // Creamos e iniciamos el servidor en un hilo separado.
         Server server = new Server();
         server.start();
+
+        // Esperamos hasta que el servidor obtenga un puerto válido o se agote el tiempo.
         int port = awaitPort(() -> server.port, 2000);
-        if (port == -1) { System.out.println("No se pudo iniciar el servidor UDP."); return; }
+        if (port == -1) { 
+            System.out.println("No se pudo iniciar el servidor UDP."); 
+            return; // Salimos si el servidor no pudo iniciar correctamente.
+        }
         System.out.println("Servidor UDP en puerto: " + port);
 
         // Cliente de prueba que envía números y espera respuesta con timeout.
-        try (DatagramSocket c = new DatagramSocket()) {
-            // Timeout para no bloquear indefinidamente cuando hay pérdidas.
-            c.setSoTimeout(500);
-            for (int i = 1; i <= 10; i++) {
-                byte[] out = ("" + i).getBytes(StandardCharsets.UTF_8);
-                c.send(new DatagramPacket(out, out.length, InetAddress.getByName("127.0.0.1"), port));
-                byte[] buf = new byte[128];
-                DatagramPacket resp = new DatagramPacket(buf, buf.length);
+        try (DatagramSocket c = new DatagramSocket()) { // Creamos un socket UDP para el cliente.
+            c.setSoTimeout(500); // Establecemos un timeout para evitar bloqueos indefinidos.
+
+            for (int i = 1; i <= 10; i++) { // Enviamos 10 números consecutivos al servidor.
+                byte[] out = ("" + i).getBytes(StandardCharsets.UTF_8); // Convertimos el número a bytes.
+                c.send(new DatagramPacket(out, out.length, InetAddress.getByName("127.0.0.1"), port)); // Enviamos el datagrama al servidor.
+
+                byte[] buf = new byte[128]; // Buffer para recibir la respuesta.
+                DatagramPacket resp = new DatagramPacket(buf, buf.length); // Preparamos un paquete para recibir la respuesta.
+
                 try {
-                    // Intentamos recibir; si no llega, asumimos pérdida simulada.
-                    c.receive(resp);
-                    String ans = new String(resp.getData(), 0, resp.getLength(), StandardCharsets.UTF_8);
-                    System.out.printf("Enviado=%d | Recibido=%s%n", i, ans);
+                    c.receive(resp); // Intentamos recibir la respuesta del servidor.
+                    String ans = new String(resp.getData(), 0, resp.getLength(), StandardCharsets.UTF_8); // Convertimos la respuesta a texto.
+                    System.out.printf("Enviado=%d | Recibido=%s%n", i, ans); // Mostramos el número enviado y la respuesta recibida.
                 } catch (SocketTimeoutException ste) {
-                    // Timeout: datagrama perdido o servidor no respondió.
+                    // Si no recibimos respuesta dentro del timeout, asumimos que el datagrama se perdió.
                     System.out.printf("Enviado=%d | (perdido)%n", i);
                 }
             }
         } catch (Exception e) {
+            // Capturamos cualquier excepción y mostramos un mensaje de error.
             System.out.println("Cliente UDP (E1) error: " + e.getMessage());
         } finally {
             // Aseguramos el cierre del servidor al finalizar la demo.

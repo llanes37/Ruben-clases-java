@@ -82,11 +82,11 @@ public class UT1_VariablesTiposOperadores {
         // * ✨ EJEMPLO 2: Uso de operadores aritméticos
         // ────────────────────────────────────────────────────────────
         int a = 10, b = 5;
-        System.out.println("Suma: " + (a + b));
+        /* System.out.println("Suma: " + (a + b));
         System.out.println("Resta: " + (a - b));
         System.out.println("Multiplicación: " + (a * b));
         System.out.println("División: " + (a / b));
-        System.out.println("Módulo (resto de la división): " + (a % b));
+        System.out.println("Módulo (resto de la división): " + (a % b)); */
 
         // * ✨ EJEMPLO 3: Uso de operadores de comparación
         // ────────────────────────────────────────────────────────────

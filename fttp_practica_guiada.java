@@ -1,6 +1,6 @@
 // ==============================================================================
 //   FTTP‑Lite (Práctica guiada SIN código) — Plantilla en Java con MENÚ
-//   Autor: ChatGPT para clases DAM (M0490: Programación de Servicios y Procesos)
+//   Autor: JOAQUIN
 //   Curso 2025–2026
 //
 //   ▶ Propósito didáctico

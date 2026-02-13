@@ -1,0 +1,32 @@
+[
+  {
+    "id_producto": 1,
+    "nombre": "Portatil Lenovo",
+    "precio": 699.0,
+    "stock": 8
+  },
+  {
+    "id_producto": 2,
+    "nombre": "Monitor 24 pulgadas",
+    "precio": 149.9,
+    "stock": 15
+  },
+  {
+    "id_producto": 3,
+    "nombre": "Teclado mecanico",
+    "precio": 59.95,
+    "stock": 20
+  },
+  {
+    "id_producto": 4,
+    "nombre": "Raton inalambrico",
+    "precio": 24.5,
+    "stock": 25
+  },
+  {
+    "id_producto": 5,
+    "nombre": "Disco SSD 1TB",
+    "precio": 89.99,
+    "stock": 12
+  }
+]

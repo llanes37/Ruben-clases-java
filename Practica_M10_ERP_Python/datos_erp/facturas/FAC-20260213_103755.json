@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-02-13 10:37:55",
+  "items": [
+    {
+      "id_producto": 1,
+      "nombre": "Portatil Lenovo",
+      "precio_unitario": 699.0,
+      "cantidad": 2
+    }
+  ],
+  "base_imponible": 1398.0,
+  "iva": 293.58,
+  "total": 1691.58,
+  "cesta_vaciada": true,
+  "numero_factura": "FAC-20260213_103755",
+  "archivo_texto": "FAC-20260213_103755.txt"
+}

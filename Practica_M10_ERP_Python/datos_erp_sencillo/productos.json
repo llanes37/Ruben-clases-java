@@ -1,0 +1,26 @@
+[
+  {
+    "id_producto": 1,
+    "nombre": "Portatil basico",
+    "precio": 599.0,
+    "stock": 8
+  },
+  {
+    "id_producto": 2,
+    "nombre": "Monitor 24",
+    "precio": 149.0,
+    "stock": 12
+  },
+  {
+    "id_producto": 3,
+    "nombre": "Teclado",
+    "precio": 29.9,
+    "stock": 20
+  },
+  {
+    "id_producto": 4,
+    "nombre": "Raton",
+    "precio": 19.9,
+    "stock": 30
+  }
+]
